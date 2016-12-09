@@ -194,7 +194,7 @@ function formatLicense (license) {
   return 'unknown license'
 }
 
-module.exports = function checkPath (packageName, basePath, overrides, includeDevDependencies, includeOptDependencies, seenList) {
+module.exports = function checkPath (packageName, basePath, overrides, includeDevDependencies, includeOptDependencies, childDeps, seenList) {
   seenList = seenList || {}
   var seenKey = basePath + '|' + packageName
   if (seenList[seenKey]) {
@@ -203,8 +203,10 @@ module.exports = function checkPath (packageName, basePath, overrides, includeDe
   seenList[seenKey] = true
   if (!fs.existsSync(basePath)) {
     const parentNodeModules = path.join(path.resolve(basePath, '../../../node_modules'), packageName)
-    if (parentNodeModules !== basePath) {
-      return checkPath(packageName, parentNodeModules, overrides, includeDevDependencies, includeOptDependencies, seenList)
+    if (childDeps) {
+      if (parentNodeModules !== basePath) {
+        return checkPath(packageName, parentNodeModules, overrides, includeDevDependencies, includeOptDependencies, childDeps, seenList)
+      }
     }
     return null
   }
@@ -280,7 +282,7 @@ module.exports = function checkPath (packageName, basePath, overrides, includeDe
   var dependencies = []
   var pushDependency = function (dependencyLevel) {
     return function (name) {
-      var res = checkPath(name, path.join(basePath, 'node_modules', name), overrides, includeDevDependencies, includeOptDependencies, seenList)
+      var res = checkPath(name, path.join(basePath, 'node_modules', name), overrides, includeDevDependencies, includeOptDependencies, childDeps, seenList)
       if (res) {
         res.name = name
         res.deps = res.deps || []

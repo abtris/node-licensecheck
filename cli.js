@@ -12,6 +12,7 @@ var path = '.'
 var overridesPath = './licenses.json'
 var missingOnly = false
 var flat = false
+var childDeps = true
 var format = 'color'
 var highlight = null
 var includeDevDependencies = false
@@ -43,6 +44,9 @@ for (var i = 2; i < process.argv.length; i++) {
     case '--missing-only':
       missingOnly = true
       break
+    case '--omit-child-deps':
+      childDeps = false
+      break
     case '-h':
     case '--highlight':
       highlight = new RegExp(process.argv[++i], 'i')
@@ -72,7 +76,7 @@ for (var i = 2; i < process.argv.length; i++) {
 var overrides = fs.existsSync(overridesPath) &&
     JSON.parse(stripJsonComments(fs.readFileSync(overridesPath, 'utf8'))) || {}
 
-var licenses = licensecheck('.', path, overrides, includeDevDependencies, includeOptDependencies)
+var licenses = licensecheck('.', path, overrides, includeDevDependencies, includeOptDependencies, childDeps)
 if (flat) {
   var dependencies = makeFlatDependencyMap(licenses)
   Object.keys(dependencies).sort().forEach(function (key) {

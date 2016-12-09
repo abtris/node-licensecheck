@@ -28,7 +28,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "test-dev": "mocha --watch",
+    "test-dev": "./node_module/.bin/mocha --watch",
     "test": "npm run lint && mocha"
   },
   "license": "zlib",
